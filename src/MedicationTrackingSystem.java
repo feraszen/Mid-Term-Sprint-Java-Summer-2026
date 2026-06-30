@@ -2,42 +2,65 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * MedicationTrackingSystem is the core controller of the pharmacy system.
+ * It manages patients, doctors, medications, and prescriptions.
+ * Old behavior is preserved, and new OOP improvements are added.
+ */
 public class MedicationTrackingSystem {
 
+    // ===== LISTS (OLD FIELDS, KEPT) =====
     private ArrayList<Patient> patients = new ArrayList<>();
     private ArrayList<Doctor> doctors = new ArrayList<>();
     private ArrayList<Medication> medications = new ArrayList<>();
     private ArrayList<Prescription> prescriptions = new ArrayList<>();
 
-    private final String PATIENTS_FILE = "src/data/patients.txt";
-    private final String DOCTORS_FILE = "src/data/doctors.txt";
-    private final String MEDICATIONS_FILE = "src/data/medications.txt";
-    private final String PRESCRIPTIONS_FILE = "src/data/prescriptions.txt";
+    // ===== FILE PATHS (UPDATED TO USE data/ FOLDER) =====
+    private final String PATIENT_FILE = "data/patients.txt";
+    private final String DOCTOR_FILE = "data/doctors.txt";
+    private final String MEDICATION_FILE = "data/medications.txt";
+    private final String PRESCRIPTION_FILE = "data/prescriptions.txt";
 
-    private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
-    // ============================================================
-    // ======================= LOAD DATA ===========================
-    // ============================================================
-
+    /**
+     * Loads all data from files when the system starts.
+     */
     public void loadAllData() {
         loadPatients();
         loadDoctors();
         loadMedications();
         loadPrescriptions();
-        linkLoadedPrescriptions();
     }
 
+    /**
+     * Saves all data to files when the system exits.
+     */
+    public void saveAllData() {
+        savePatients();
+        saveDoctors();
+        saveMedications();
+        savePrescriptions();
+    }
+
+    // ============================================================
+    // ===================== LOAD METHODS ==========================
+    // ============================================================
+
+    /**
+     * Loads all patients from data/patients.txt
+     * Format: id,name,age,phone
+     */
     private void loadPatients() {
-        try {
-            File file = new File(PATIENTS_FILE);
-            if (!file.exists()) return;
+        patients.clear();
 
-            BufferedReader br = new BufferedReader(new FileReader(file));
+        try (BufferedReader br = new BufferedReader(new FileReader(PATIENT_FILE))) {
+
             String line;
-
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split("\\|");
+
+                String[] parts = line.split(",");
+
+                if (parts.length != 4) continue;
+
                 int id = Integer.parseInt(parts[0]);
                 String name = parts[1];
                 int age = Integer.parseInt(parts[2]);
@@ -46,22 +69,27 @@ public class MedicationTrackingSystem {
                 patients.add(new Patient(id, name, age, phone));
             }
 
-            br.close();
         } catch (Exception e) {
-            System.out.println("Error loading patients.");
+            System.out.println("Error loading patients: " + e.getMessage());
         }
     }
 
+    /**
+     * Loads all doctors from data/doctors.txt
+     * Format: id,name,age,phone,specialization
+     */
     private void loadDoctors() {
-        try {
-            File file = new File(DOCTORS_FILE);
-            if (!file.exists()) return;
+        doctors.clear();
 
-            BufferedReader br = new BufferedReader(new FileReader(file));
+        try (BufferedReader br = new BufferedReader(new FileReader(DOCTOR_FILE))) {
+
             String line;
-
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split("\\|");
+
+                String[] parts = line.split(",");
+
+                if (parts.length != 5) continue;
+
                 int id = Integer.parseInt(parts[0]);
                 String name = parts[1];
                 int age = Integer.parseInt(parts[2]);
@@ -71,22 +99,29 @@ public class MedicationTrackingSystem {
                 doctors.add(new Doctor(id, name, age, phone, spec));
             }
 
-            br.close();
         } catch (Exception e) {
-            System.out.println("Error loading doctors.");
+            System.out.println("Error loading doctors: " + e.getMessage());
         }
     }
 
+    /**
+     * Loads all medications from data/medications.txt
+     * Format: id,name,dose,stock,expiryDate
+     * expiryDate format: dd/MM/yyyy
+     */
     private void loadMedications() {
-        try {
-            File file = new File(MEDICATIONS_FILE);
-            if (!file.exists()) return;
+        medications.clear();
 
-            BufferedReader br = new BufferedReader(new FileReader(file));
+        try (BufferedReader br = new BufferedReader(new FileReader(MEDICATION_FILE))) {
+
             String line;
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split("\\|");
+
+                String[] parts = line.split(",");
+
+                if (parts.length != 5) continue;
 
                 int id = Integer.parseInt(parts[0]);
                 String name = parts[1];
@@ -97,162 +132,182 @@ public class MedicationTrackingSystem {
                 medications.add(new Medication(id, name, stock, expiry, dose));
             }
 
-            br.close();
         } catch (Exception e) {
-            System.out.println("Error loading medications.");
+            System.out.println("Error loading medications: " + e.getMessage());
         }
     }
 
+    /**
+     * Loads all prescriptions from data/prescriptions.txt
+     * Format: id,doctorId,patientId,medicationId,issueDate,expiryDate
+     * Dates format: dd/MM/yyyy
+     */
     private void loadPrescriptions() {
-        try {
-            File file = new File(PRESCRIPTIONS_FILE);
-            if (!file.exists()) return;
+        prescriptions.clear();
 
-            BufferedReader br = new BufferedReader(new FileReader(file));
+        try (BufferedReader br = new BufferedReader(new FileReader(PRESCRIPTION_FILE))) {
+
             String line;
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split("\\|");
+
+                String[] parts = line.split(",");
+
+                if (parts.length != 6) continue;
 
                 int id = Integer.parseInt(parts[0]);
                 int doctorId = Integer.parseInt(parts[1]);
                 int patientId = Integer.parseInt(parts[2]);
                 int medicationId = Integer.parseInt(parts[3]);
-                Date issueDate = sdf.parse(parts[4]);
-                Date expiryDate = sdf.parse(parts[5]);
+                Date issue = sdf.parse(parts[4]);
+                Date expiry = sdf.parse(parts[5]);
 
-                prescriptions.add(new Prescription(id, doctorId, patientId, medicationId, issueDate, expiryDate));
+                // Old constructor using IDs only (kept)
+                prescriptions.add(new Prescription(id, doctorId, patientId, medicationId, issue, expiry));
             }
 
-            br.close();
         } catch (Exception e) {
-            System.out.println("Error loading prescriptions.");
+            System.out.println("Error loading prescriptions: " + e.getMessage());
         }
     }
 
     // ============================================================
-    // =============== LINK PRESCRIPTIONS TO PATIENTS =============
+    // ===================== SAVE METHODS ==========================
     // ============================================================
 
-    private void linkLoadedPrescriptions() {
-        for (Prescription p : prescriptions) {
-            Patient pat = findPatientById(p.getPatientId());
-            if (pat != null) {
-                pat.addPrescription(p);
-            }
-        }
-    }
-
-    // ============================================================
-    // ======================= SAVE DATA ===========================
-    // ============================================================
-
-    public void saveAllData() {
-        savePatients();
-        saveDoctors();
-        saveMedications();
-        savePrescriptions();
-    }
-
+    /**
+     * Saves all patients to data/patients.txt
+     * Format: id,name,age,phone
+     */
     private void savePatients() {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(PATIENTS_FILE));
+        try (PrintWriter pw = new PrintWriter(new FileWriter(PATIENT_FILE))) {
 
             for (Patient p : patients) {
-                bw.write(p.getId() + "|" + p.getName() + "|" + p.getAge() + "|" + p.getPhone());
-                bw.newLine();
+                pw.println(p.getId() + "," +
+                           p.getName() + "," +
+                           p.getAge() + "," +
+                           p.getPhone());
             }
 
-            bw.close();
         } catch (Exception e) {
-            System.out.println("Error saving patients.");
+            System.out.println("Error saving patients: " + e.getMessage());
         }
     }
 
+    /**
+     * Saves all doctors to data/doctors.txt
+     * Format: id,name,age,phone,specialization
+     */
     private void saveDoctors() {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(DOCTORS_FILE));
+        try (PrintWriter pw = new PrintWriter(new FileWriter(DOCTOR_FILE))) {
 
             for (Doctor d : doctors) {
-                bw.write(d.getId() + "|" + d.getName() + "|" + d.getAge() + "|" + d.getPhone() + "|" + d.getSpecialization());
-                bw.newLine();
+                pw.println(d.getId() + "," +
+                           d.getName() + "," +
+                           d.getAge() + "," +
+                           d.getPhone() + "," +
+                           d.getSpecialization());
             }
 
-            bw.close();
         } catch (Exception e) {
-            System.out.println("Error saving doctors.");
+            System.out.println("Error saving doctors: " + e.getMessage());
         }
     }
 
+    /**
+     * Saves all medications to data/medications.txt
+     * Format: id,name,dose,stock,expiryDate
+     */
     private void saveMedications() {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(MEDICATIONS_FILE));
+        try (PrintWriter pw = new PrintWriter(new FileWriter(MEDICATION_FILE))) {
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
             for (Medication m : medications) {
-                bw.write(m.getId() + "|" + m.getName() + "|" + m.getDose() + "|" + m.getStock() + "|" + sdf.format(m.getExpiryDate()));
-                bw.newLine();
+                pw.println(m.getId() + "," +
+                           m.getName() + "," +
+                           m.getDose() + "," +
+                           m.getStock() + "," +
+                           sdf.format(m.getExpiryDate()));
             }
 
-            bw.close();
         } catch (Exception e) {
-            System.out.println("Error saving medications.");
+            System.out.println("Error saving medications: " + e.getMessage());
         }
     }
 
+    /**
+     * Saves all prescriptions to data/prescriptions.txt
+     * Format: id,doctorId,patientId,medicationId,issueDate,expiryDate
+     */
     private void savePrescriptions() {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(PRESCRIPTIONS_FILE));
+        try (PrintWriter pw = new PrintWriter(new FileWriter(PRESCRIPTION_FILE))) {
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
             for (Prescription p : prescriptions) {
-                bw.write(
-                        p.getId() + "|" +
-                        p.getDoctorId() + "|" +
-                        p.getPatientId() + "|" +
-                        p.getMedicationId() + "|" +
-                        sdf.format(p.getIssueDate()) + "|" +
-                        sdf.format(p.getExpiryDate())
-                );
-                bw.newLine();
+                pw.println(p.getId() + "," +
+                           p.getDoctorId() + "," +
+                           p.getPatientId() + "," +
+                           p.getMedicationId() + "," +
+                           sdf.format(p.getIssueDate()) + "," +
+                           sdf.format(p.getExpiryDate()));
             }
 
-            bw.close();
         } catch (Exception e) {
-            System.out.println("Error saving prescriptions.");
+            System.out.println("Error saving prescriptions: " + e.getMessage());
         }
     }
 
     // ============================================================
-    // ======================= CORE METHODS ========================
+    // ===================== ADD METHODS ===========================
     // ============================================================
 
+    /**
+     * Adds a new patient to the system.
+     */
     public void addPatient(Patient p) {
         patients.add(p);
-        saveAllData();
+        savePatients();
     }
 
+    /**
+     * Adds a new doctor to the system.
+     */
     public void addDoctor(Doctor d) {
         doctors.add(d);
-        saveAllData();
+        saveDoctors();
     }
 
+    /**
+     * Adds a new medication to the system.
+     */
     public void addMedication(Medication m) {
         medications.add(m);
-        saveAllData();
+        saveMedications();
     }
 
+    /**
+     * Adds a new prescription to the system.
+     * Uses object references and also links to patient and doctor.
+     */
     public void addPrescription(Prescription p) {
         prescriptions.add(p);
 
-        Patient pat = findPatientById(p.getPatientId());
-        if (pat != null) {
-            pat.addPrescription(p);
+        if (p.getPatient() != null) {
+            p.getPatient().addPrescription(p);
         }
 
-        saveAllData();
+        if (p.getDoctor() != null) {
+            p.getDoctor().addPrescription(p);
+        }
+
+        savePrescriptions();
     }
 
     // ============================================================
-    // ======================= FIND METHODS ========================
+    // ===================== SEARCH METHODS ========================
     // ============================================================
 
     public Patient findPatientById(int id) {
@@ -276,9 +331,9 @@ public class MedicationTrackingSystem {
         return null;
     }
 
-    public Medication findMedicationByName(String name) {
-        for (Medication m : medications) {
-            if (m.getName().equalsIgnoreCase(name)) return m;
+    public Patient findPatientByName(String name) {
+        for (Patient p : patients) {
+            if (p.getName().equalsIgnoreCase(name)) return p;
         }
         return null;
     }
@@ -290,93 +345,129 @@ public class MedicationTrackingSystem {
         return null;
     }
 
-    public Patient findPatientByName(String name) {
-        for (Patient p : patients) {
-            if (p.getName().equalsIgnoreCase(name)) return p;
+    public Medication findMedicationByName(String name) {
+        for (Medication m : medications) {
+            if (m.getName().equalsIgnoreCase(name)) return m;
         }
         return null;
     }
 
-    // ============================================================
-    // ======================= REPORTS =============================
-    // ============================================================
+// ============================================================
+// ===================== EDIT / DELETE =========================
+// ============================================================
 
-    public void listPatients() {
-        for (Patient p : patients) System.out.println(p);
+/**
+ * Edits doctor information.
+ */
+public void editDoctor(int id, String name, int age, String phone, String spec) {
+    Doctor d = findDoctorById(id);
+    if (d != null) {
+        d.setName(name);
+        d.setAge(age);
+        d.setPhone(phone);
+        d.setSpecialization(spec);
+        saveDoctors();
     }
+}
 
-    public void listDoctors() {
-        for (Doctor d : doctors) System.out.println(d);
+/**
+ * Edits patient information.
+ */
+public void editPatient(int id, String name, int age, String phone) {
+    Patient p = findPatientById(id);
+    if (p != null) {
+        p.setName(name);
+        p.setAge(age);
+        p.setPhone(phone);
+        savePatients();
     }
+}
 
-    public void listMedications() {
-        for (Medication m : medications) System.out.println(m);
-    }
+/**
+ * Deletes a doctor by ID.
+ */
+public void deleteDoctor(int id) {
+    doctors.removeIf(d -> d.getId() == id);
+    saveDoctors();
+}
 
-    public void listPrescriptions() {
-        for (Prescription p : prescriptions) System.out.println(p);
-    }
+/**
+ * Deletes a prescription by ID.
+ */
+public void deletePrescription(int presId) {
 
-    public void listExpiredMedications() {
-        Date today = new Date();
-        for (Medication m : medications) {
-            if (m.getExpiryDate().before(today)) {
-                System.out.println("Expired: " + m);
-            }
+    Prescription target = null;
+
+    // Find the prescription
+    for (Prescription p : prescriptions) {
+        if (p.getId() == presId) {
+            target = p;
+            break;
         }
     }
 
-    public void listMedicationsExpiringSoon() {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, 30);
-        Date soon = cal.getTime();
-
-        for (Medication m : medications) {
-            if (m.getExpiryDate().after(new Date()) && m.getExpiryDate().before(soon)) {
-                System.out.println("Expiring Soon: " + m);
-            }
-        }
+    if (target == null) {
+        System.out.println("Prescription not found.");
+        return;
     }
 
-    public void listExpiredPrescriptions() {
-        Date today = new Date();
-        for (Prescription p : prescriptions) {
-            if (p.getExpiryDate().before(today)) {
-                System.out.println("Expired Prescription: " + p);
-            }
-        }
+    // Remove from main list
+    prescriptions.remove(target);
+
+    // Remove from doctor
+    Doctor d = findDoctorById(target.getDoctorId());
+    if (d != null) {
+        d.getPrescriptions().remove(target);
     }
 
-    public void generateFullReport() {
-        System.out.println("=== FULL SYSTEM REPORT ===");
-        listPatients();
-        listDoctors();
-        listMedications();
-        listPrescriptions();
+    // Remove from patient
+    Patient pat = findPatientById(target.getPatientId());
+    if (pat != null) {
+        pat.getPrescriptions().remove(target);
     }
+
+    // Save file
+    savePrescriptions();
+
+    System.out.println("✔ Prescription deleted successfully.");
+}
+
 
     // ============================================================
-    // =============== EXTRA METHODS (PROJECT FEATURES) ===========
+    // ===================== LINK OPERATIONS =======================
     // ============================================================
 
-    public boolean addPatientToDoctorById(int doctorId, String doctorName,
-                                          int patientId, String patientName) {
+    /**
+     * Adds a patient to a doctor using IDs and names.
+     * Returns true if names match IDs, false otherwise.
+     */
+    public boolean addPatientToDoctorById(int docId, String docName,
+                                          int patId, String patName) {
 
-        Doctor d = findDoctorById(doctorId);
-        Patient p = findPatientById(patientId);
+        Doctor d = findDoctorById(docId);
+        Patient p = findPatientById(patId);
 
         if (d == null || p == null) return false;
 
-        boolean namesMatch = d.getName().equalsIgnoreCase(doctorName)
-                && p.getName().equalsIgnoreCase(patientName);
+        boolean nameMatch = d.getName().equalsIgnoreCase(docName)
+                && p.getName().equalsIgnoreCase(patName);
 
         d.addPatient(p);
-        saveAllData();
+        saveDoctors();
 
-        return namesMatch;
+        return nameMatch;
     }
 
-    public void acceptPrescription(int presId, String doctorName, String patientName, String medicationName) {
+    // ============================================================
+    // ===================== ACCEPT PRESCRIPTIONS ==================
+    // ============================================================
+
+    /**
+     * Accepts a prescription using names only.
+     * Creates a Prescription object with Doctor, Patient, and Medication references.
+     */
+    public void acceptPrescription(int presId, String doctorName,
+                                   String patientName, String medicationName) {
 
         Doctor d = findDoctorByName(doctorName);
         Patient p = findPatientByName(patientName);
@@ -387,93 +478,157 @@ public class MedicationTrackingSystem {
             return;
         }
 
-        Date today = new Date();
+        Date issueDate = new Date(); // today
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, 30);
-        Date expiry = cal.getTime();
+        cal.add(Calendar.YEAR, 1);   // expiry after 1 year
+        Date expiryDate = cal.getTime();
 
-        Prescription pres = new Prescription(presId, d.getId(), p.getId(), m.getId(), today, expiry);
+        Prescription pres = new Prescription(presId, d, p, m, issueDate, expiryDate);
 
         addPrescription(pres);
     }
 
+    /**
+     * Accepts a prescription using IDs and names.
+     * Returns true if names match IDs, false otherwise.
+     */
     public boolean acceptPrescriptionById(int presId,
-                                          int doctorId, String doctorName,
-                                          int patientId, String patientName,
-                                          int medicationId, String medicationName) {
+                                          int docId, String docName,
+                                          int patId, String patName,
+                                          int medId, String medName) {
 
-        Doctor d = findDoctorById(doctorId);
-        Patient p = findPatientById(patientId);
-        Medication m = findMedicationById(medicationId);
+        Doctor d = findDoctorById(docId);
+        Patient p = findPatientById(patId);
+        Medication m = findMedicationById(medId);
 
-        if (d == null || p == null || m == null) return false;
+        if (d == null || p == null || m == null) {
+            System.out.println("Error: Doctor, Patient, or Medication not found.");
+            return false;
+        }
 
-        boolean namesMatch = d.getName().equalsIgnoreCase(doctorName)
-                && p.getName().equalsIgnoreCase(patientName)
-                && m.getName().equalsIgnoreCase(medicationName);
+        boolean namesMatch =
+                d.getName().equalsIgnoreCase(docName) &&
+                p.getName().equalsIgnoreCase(patName) &&
+                m.getName().equalsIgnoreCase(medName);
 
-        Date today = new Date();
+        Date issueDate = new Date();
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, 30);
-        Date expiry = cal.getTime();
+        cal.add(Calendar.YEAR, 1);
+        Date expiryDate = cal.getTime();
 
-        Prescription pres = new Prescription(presId, doctorId, patientId, medicationId, today, expiry);
+        Prescription pres = new Prescription(presId, d, p, m, issueDate, expiryDate);
 
         addPrescription(pres);
 
         return namesMatch;
     }
 
-    public void editDoctor(int id, String name, int age, String phone, String spec) {
-        Doctor d = findDoctorById(id);
-        if (d == null) {
-            System.out.println("Doctor not found.");
-            return;
+    // ============================================================
+    // ===================== LIST / REPORT METHODS =================
+    // ============================================================
+
+    /**
+     * Lists all patients.
+     */
+    public void listPatients() {
+        for (Patient p : patients) {
+            System.out.println(p);
         }
-
-        d.setName(name);
-        d.setAge(age);
-        d.setPhone(phone);
-        d.setSpecialization(spec);
-
-        saveAllData();
     }
 
-    public void deleteDoctor(int id) {
-        Doctor d = findDoctorById(id);
-        if (d == null) {
-            System.out.println("Doctor not found.");
-            return;
+    /**
+     * Lists all doctors.
+     */
+    public void listDoctors() {
+        for (Doctor d : doctors) {
+            System.out.println(d);
         }
-
-        doctors.remove(d);
-        saveAllData();
     }
 
-    public void restockMedications() {
+    /**
+     * Lists all medications.
+     */
+    public void listMedications() {
         for (Medication m : medications) {
-            m.setStock(m.getStock() + 50);
+            System.out.println(m);
         }
-        saveAllData();
-        System.out.println("✔ All medications restocked by +50.");
     }
 
-    public void listPrescriptionsByDoctor(String doctorName) {
-        Doctor d = findDoctorByName(doctorName);
-        if (d == null) {
-            System.out.println("Doctor not found.");
-            return;
+    /**
+     * Lists all prescriptions.
+     */
+    public void listPrescriptions() {
+        for (Prescription p : prescriptions) {
+            System.out.println(p);
         }
+    }
+
+    /**
+     * Lists expired medications (expiry date before today).
+     */
+    public void listExpiredMedications() {
+        Date today = new Date();
+
+        for (Medication m : medications) {
+            if (m.getExpiryDate().before(today)) {
+                System.out.println("Expired Medication: " + m);
+            }
+        }
+    }
+
+    /**
+     * Lists medications expiring within the next 30 days.
+     */
+    public void listMedicationsExpiringSoon() {
+        Date today = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_YEAR, 30);
+        Date soon = cal.getTime();
+
+        for (Medication m : medications) {
+            if (m.getExpiryDate().after(today) &&
+                m.getExpiryDate().before(soon)) {
+                System.out.println("Expiring Soon: " + m);
+            }
+        }
+    }
+
+    /**
+     * Lists expired prescriptions (expiry date before today).
+     */
+    public void listExpiredPrescriptions() {
+        Date today = new Date();
 
         for (Prescription p : prescriptions) {
-            if (p.getDoctorId() == d.getId()) {
-                System.out.println(p);
+            if (p.getExpiryDate().before(today)) {
+                System.out.println("Expired Prescription: " + p);
             }
         }
     }
 
+    /**
+     * Lists prescriptions issued by a specific doctor (by name).
+     */
+    public void listPrescriptionsByDoctor(String doctorName) {
+        Doctor d = findDoctorByName(doctorName);
+
+        if (d == null) {
+            System.out.println("Doctor not found.");
+            return;
+        }
+
+        for (Prescription p : d.getPrescriptions()) {
+            System.out.println(p);
+        }
+    }
+
+    /**
+     * Lists medications prescribed to a patient in the past year (by name).
+     * Shows only medication names.
+     */
     public void listPatientPrescriptionsPastYear(String patientName) {
         Patient p = findPatientByName(patientName);
+
         if (p == null) {
             System.out.println("Patient not found.");
             return;
@@ -483,43 +638,91 @@ public class MedicationTrackingSystem {
         cal.add(Calendar.YEAR, -1);
         Date oneYearAgo = cal.getTime();
 
+        System.out.println("Medications for " + p.getName() + " in the past year:");
+
         for (Prescription pres : p.getPrescriptions()) {
             if (pres.getIssueDate().after(oneYearAgo)) {
-                System.out.println(pres);
+                System.out.println("- " + pres.getMedication().getName());
             }
         }
     }
 
-    public void editPatient(int id, String name, int age, String phone) {
-        Patient p = findPatientById(id);
+    /**
+     * Lists medications prescribed to a patient in the past year using ID + name.
+     * Returns true if name matches ID, false otherwise.
+     */
+    public boolean listPatientPrescriptionsPastYearById(int patientId, String patientName) {
+        Patient p = findPatientById(patientId);
+
         if (p == null) {
             System.out.println("Patient not found.");
-            return;
+            return false;
         }
 
-        p.setName(name);
-        p.setAge(age);
-        p.setPhone(phone);
-
-        saveAllData();
-    }
-
-    public boolean listPatientPrescriptionsPastYearById(int id, String name) {
-        Patient p = findPatientById(id);
-        if (p == null) return false;
-
-        boolean nameMatch = p.getName().equalsIgnoreCase(name);
+        boolean nameMatch = p.getName().equalsIgnoreCase(patientName);
 
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, -1);
         Date oneYearAgo = cal.getTime();
 
+        System.out.println("Medications for " + p.getName() + " in the past year:");
+
         for (Prescription pres : p.getPrescriptions()) {
             if (pres.getIssueDate().after(oneYearAgo)) {
-                System.out.println(pres);
+                System.out.println("- " + pres.getMedication().getName());
             }
         }
 
         return nameMatch;
+    }
+
+    // ============================================================
+    // ===================== RESTOCK & FULL REPORT =================
+    // ============================================================
+
+    /**
+     * Restocks all medications with low stock.
+     * Simple example: if stock < 10, add 20 units.
+     */
+    public void restockMedications() {
+        for (Medication m : medications) {
+            if (m.getStock() < 10) {
+                m.setStock(m.getStock() + 20);
+                System.out.println("Restocked: " + m.getName() +
+                                   " new stock = " + m.getStock());
+            }
+        }
+        saveMedications();
+    }
+
+    /**
+     * Generates a full system report.
+     * Shows all entities and key status information.
+     */
+    public void generateFullReport() {
+        System.out.println("===== FULL SYSTEM REPORT =====");
+
+        System.out.println("\n--- Patients ---");
+        listPatients();
+
+        System.out.println("\n--- Doctors ---");
+        listDoctors();
+
+        System.out.println("\n--- Medications ---");
+        listMedications();
+
+        System.out.println("\n--- Prescriptions ---");
+        listPrescriptions();
+
+        System.out.println("\n--- Expired Medications ---");
+        listExpiredMedications();
+
+        System.out.println("\n--- Medications Expiring Soon ---");
+        listMedicationsExpiringSoon();
+
+        System.out.println("\n--- Expired Prescriptions ---");
+        listExpiredPrescriptions();
+
+        System.out.println("===== END OF REPORT =====");
     }
 }

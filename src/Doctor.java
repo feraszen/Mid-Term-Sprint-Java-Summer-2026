@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 
+/**
+ * Doctor class represents a doctor in the system.
+ * Supports storing patients and prescriptions linked to the doctor.
+ */
 public class Doctor {
 
     private int id;
@@ -8,7 +12,9 @@ public class Doctor {
     private String phone;
     private String specialization;
 
+    // NEW: lists
     private ArrayList<Patient> patients = new ArrayList<>();
+    private ArrayList<Prescription> prescriptions = new ArrayList<>();
 
     public Doctor(int id, String name, int age, String phone, String specialization) {
         this.id = id;
@@ -18,38 +24,32 @@ public class Doctor {
         this.specialization = specialization;
     }
 
-    public int getId() {
-        return id;
-    }
+    // ===== GETTERS =====
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    public String getPhone() { return phone; }
+    public String getSpecialization() { return specialization; }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getSpecialization() {
-        return specialization;
-    }
-
-    public ArrayList<Patient> getPatients() {
-        return patients;
-    }
-
-    public void addPatient(Patient p) {
-        patients.add(p);
-    }
-
+    // ===== SETTERS =====
     public void setName(String name) { this.name = name; }
     public void setAge(int age) { this.age = age; }
     public void setPhone(String phone) { this.phone = phone; }
     public void setSpecialization(String specialization) { this.specialization = specialization; }
+
+    // ===== PATIENT LINK =====
+    public void addPatient(Patient p) {
+        patients.add(p);
+    }
+
+    // ===== PRESCRIPTION LINK =====
+    public void addPrescription(Prescription p) {
+        prescriptions.add(p);
+    }
+
+    public ArrayList<Prescription> getPrescriptions() {
+        return prescriptions;
+    }
 
     @Override
     public String toString() {

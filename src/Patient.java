@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 
+/**
+ * Patient class represents a patient in the system.
+ * Supports storing prescriptions linked to the patient.
+ */
 public class Patient {
 
     private int id;
@@ -7,6 +11,7 @@ public class Patient {
     private int age;
     private String phone;
 
+    // NEW: list of prescriptions
     private ArrayList<Prescription> prescriptions = new ArrayList<>();
 
     public Patient(int id, String name, int age, String phone) {
@@ -16,33 +21,25 @@ public class Patient {
         this.phone = phone;
     }
 
-    public int getId() {
-        return id;
-    }
+    // ===== GETTERS =====
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    public String getPhone() { return phone; }
 
-    public String getName() {
-        return name;
-    }
+    // ===== SETTERS =====
+    public void setName(String name) { this.name = name; }
+    public void setAge(int age) { this.age = age; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public int getAge() {
-        return age;
-    }
-
-    public String getPhone() {
-        return phone;
+    // ===== PRESCRIPTION LINK =====
+    public void addPrescription(Prescription p) {
+        prescriptions.add(p);
     }
 
     public ArrayList<Prescription> getPrescriptions() {
         return prescriptions;
     }
-
-    public void addPrescription(Prescription p) {
-        prescriptions.add(p);
-    }
-
-    public void setName(String name) { this.name = name; }
-    public void setAge(int age) { this.age = age; }
-    public void setPhone(String phone) { this.phone = phone; }
 
     @Override
     public String toString() {

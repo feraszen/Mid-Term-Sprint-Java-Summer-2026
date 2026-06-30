@@ -1,5 +1,9 @@
 import java.util.Scanner;
 
+/**
+ * Main class provides the console menu interface for the system.
+ * This version keeps all old menu options and adds simple English explanations.
+ */
 public class Main {
 
     public static void main(String[] args) {
@@ -7,6 +11,7 @@ public class Main {
         MedicationTrackingSystem system = new MedicationTrackingSystem();
         Scanner sc = new Scanner(System.in);
 
+        // Load all saved data from text files
         system.loadAllData();
         System.out.println("✔ Data loaded successfully.");
 
@@ -14,6 +19,7 @@ public class Main {
 
         while (choice != 0) {
 
+            // ===== MENU DISPLAY =====
             System.out.println("\n===== PHARMACY MEDICATION TRACKING SYSTEM =====");
             System.out.println("1. Add Patient");
             System.out.println("2. Add Doctor");
@@ -35,32 +41,37 @@ public class Main {
             System.out.println("18. Edit Patient");
             System.out.println("19. Full System Report");
             System.out.println("20. Accept Prescription (BY ID + NAME)");
+            System.out.println("21. Delete Prescription");
             System.out.println("22. Patient Prescriptions (Past Year) — BY ID + NAME");
             System.out.println("23. Add Medication (Random Expiry Date)");
             System.out.println("0. Exit");
             System.out.print("Enter choice: ");
 
             try {
-                choice = sc.nextInt();
+                choice = sc.nextInt(); // Read user choice
             } catch (Exception e) {
                 System.out.println("Invalid input. Please enter a number.");
-                sc.nextLine();
+                sc.nextLine(); // Clear invalid input
                 continue;
             }
 
-            sc.nextLine();
+            sc.nextLine(); // Clear buffer
 
             switch (choice) {
 
                 case 1:
+                    // Add new patient
                     System.out.print("Enter Patient ID: ");
                     int pid = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter Patient Name: ");
                     String pname = sc.nextLine();
+
                     System.out.print("Enter Patient Age: ");
                     int page = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter Patient Phone: ");
                     String pphone = sc.nextLine();
 
@@ -68,16 +79,21 @@ public class Main {
                     break;
 
                 case 2:
+                    // Add new doctor
                     System.out.print("Enter Doctor ID: ");
                     int did = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter Doctor Name: ");
                     String dname = sc.nextLine();
+
                     System.out.print("Enter Doctor Age: ");
                     int dage = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter Doctor Phone: ");
                     String dphone = sc.nextLine();
+
                     System.out.print("Enter Doctor Specialization: ");
                     String spec = sc.nextLine();
 
@@ -85,6 +101,7 @@ public class Main {
                     break;
 
                 case 3:
+                    // Add medication with manual expiry date
                     System.out.print("Enter Medication ID: ");
                     int mid = sc.nextInt();
                     sc.nextLine();
@@ -111,22 +128,22 @@ public class Main {
                     break;
 
                 case 4:
+                    // Add patient to doctor using ID + name
                     System.out.print("Enter Doctor ID: ");
                     int docId2 = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter Doctor Name: ");
                     String docName2 = sc.nextLine();
 
                     System.out.print("Enter Patient ID: ");
                     int patId2 = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter Patient Name: ");
                     String patName2 = sc.nextLine();
 
-                    boolean match = system.addPatientToDoctorById(
-                            docId2, docName2,
-                            patId2, patName2
-                    );
+                    boolean match = system.addPatientToDoctorById(docId2, docName2, patId2, patName2);
 
                     if (!match) {
                         System.out.println("⚠ WARNING: Names do not match the IDs provided.");
@@ -143,13 +160,17 @@ public class Main {
                     break;
 
                 case 5:
+                    // Accept prescription using names
                     System.out.print("Enter Prescription ID: ");
                     int presId = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter Doctor Name: ");
                     String dn2 = sc.nextLine();
+
                     System.out.print("Enter Patient Name: ");
                     String pn2 = sc.nextLine();
+
                     System.out.print("Enter Medication Name: ");
                     String mn2 = sc.nextLine();
 
@@ -157,16 +178,21 @@ public class Main {
                     break;
 
                 case 6:
+                    // Edit doctor
                     System.out.print("Enter Doctor ID: ");
                     int edid = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter New Name: ");
                     String newDName = sc.nextLine();
+
                     System.out.print("Enter New Age: ");
                     int newDAge = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter New Phone: ");
                     String newDPhone = sc.nextLine();
+
                     System.out.print("Enter New Specialization: ");
                     String newDSpec = sc.nextLine();
 
@@ -174,65 +200,83 @@ public class Main {
                     break;
 
                 case 7:
+                    // Delete doctor
                     System.out.print("Enter Doctor ID to delete: ");
                     int delDid = sc.nextInt();
                     sc.nextLine();
+
                     system.deleteDoctor(delDid);
                     break;
 
                 case 8:
+                    // Restock medications
                     system.restockMedications();
                     break;
 
                 case 9:
+                    // List patients
                     system.listPatients();
                     break;
 
                 case 10:
+                    // List doctors
                     system.listDoctors();
                     break;
 
                 case 11:
+                    // List medications
                     system.listMedications();
                     break;
 
                 case 12:
+                    // List prescriptions
                     system.listPrescriptions();
                     break;
 
                 case 13:
+                    // List prescriptions by doctor
                     System.out.print("Enter Doctor Name: ");
                     String dn3 = sc.nextLine();
+
                     system.listPrescriptionsByDoctor(dn3);
                     break;
 
                 case 14:
+                    // List patient prescriptions (past year)
                     System.out.print("Enter Patient Name: ");
                     String pn3 = sc.nextLine();
+
                     system.listPatientPrescriptionsPastYear(pn3);
                     break;
 
                 case 15:
+                    // List expired medications
                     system.listExpiredMedications();
                     break;
 
                 case 16:
+                    // List medications expiring soon
                     system.listMedicationsExpiringSoon();
                     break;
 
                 case 17:
+                    // List expired prescriptions
                     system.listExpiredPrescriptions();
                     break;
 
                 case 18:
+                    // Edit patient
                     System.out.print("Enter Patient ID: ");
                     int epId = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter New Name: ");
                     String epName = sc.nextLine();
+
                     System.out.print("Enter New Age: ");
                     int epAge = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter New Phone: ");
                     String epPhone = sc.nextLine();
 
@@ -240,10 +284,12 @@ public class Main {
                     break;
 
                 case 19:
+                    // Full system report
                     system.generateFullReport();
                     break;
 
                 case 20:
+                    // Accept prescription using ID + name
                     System.out.print("Enter Prescription ID: ");
                     int newPresId = sc.nextInt();
                     sc.nextLine();
@@ -251,18 +297,21 @@ public class Main {
                     System.out.print("Enter Doctor ID: ");
                     int docId = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter Doctor Name: ");
                     String docName = sc.nextLine();
 
                     System.out.print("Enter Patient ID: ");
                     int patId = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter Patient Name: ");
                     String patName = sc.nextLine();
 
                     System.out.print("Enter Medication ID: ");
                     int medId = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter Medication Name: ");
                     String medName = sc.nextLine();
 
@@ -286,11 +335,20 @@ public class Main {
 
                     System.out.println("✔ Prescription accepted using ID linking!");
                     break;
+                
+                case 21:
+                    System.out.print("Enter Prescription ID to delete: ");
+                    int delPid = sc.nextInt();
+                    sc.nextLine();
+                    system.deletePrescription(delPid);
+                    break;
 
                 case 22:
+                    // Patient prescriptions (past year) using ID + name
                     System.out.print("Enter Patient ID: ");
                     int ppId = sc.nextInt();
                     sc.nextLine();
+
                     System.out.print("Enter Patient Name: ");
                     String ppName = sc.nextLine();
 
@@ -309,6 +367,7 @@ public class Main {
                     break;
 
                 case 23:
+                    // Add medication with random expiry date
                     System.out.print("Enter Medication ID: ");
                     int rid = sc.nextInt();
                     sc.nextLine();
@@ -333,6 +392,7 @@ public class Main {
                     break;
 
                 case 0:
+                    // Exit system
                     System.out.println("Saving data...");
                     system.saveAllData();
                     System.out.println("✔ Data saved. Exiting system...");

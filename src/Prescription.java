@@ -1,8 +1,14 @@
 import java.util.Date;
 
+/**
+ * Prescription class represents a medical prescription.
+ * Supports both ID-based and object-based linking.
+ */
 public class Prescription {
 
     private int id;
+
+    // OLD FIELDS (kept)
     private int doctorId;
     private int patientId;
     private int medicationId;
@@ -10,9 +16,14 @@ public class Prescription {
     private Date issueDate;
     private Date expiryDate;
 
+    // NEW FIELDS (object references)
+    private Doctor doctor;
+    private Patient patient;
+    private Medication medication;
+
+    // ===== OLD CONSTRUCTOR (IDs only) =====
     public Prescription(int id, int doctorId, int patientId, int medicationId,
                         Date issueDate, Date expiryDate) {
-
         this.id = id;
         this.doctorId = doctorId;
         this.patientId = patientId;
@@ -21,29 +32,34 @@ public class Prescription {
         this.expiryDate = expiryDate;
     }
 
-    public int getId() {
-        return id;
+    // ===== NEW CONSTRUCTOR (object references) =====
+    public Prescription(int id, Doctor doctor, Patient patient, Medication medication,
+                        Date issueDate, Date expiryDate) {
+        this.id = id;
+        this.doctor = doctor;
+        this.patient = patient;
+        this.medication = medication;
+        this.issueDate = issueDate;
+        this.expiryDate = expiryDate;
+
+        // Also store IDs for saving to file
+        this.doctorId = doctor.getId();
+        this.patientId = patient.getId();
+        this.medicationId = medication.getId();
     }
 
-    public int getDoctorId() {
-        return doctorId;
-    }
+    // ===== GETTERS =====
+    public int getId() { return id; }
+    public int getDoctorId() { return doctorId; }
+    public int getPatientId() { return patientId; }
+    public int getMedicationId() { return medicationId; }
 
-    public int getPatientId() {
-        return patientId;
-    }
+    public Doctor getDoctor() { return doctor; }
+    public Patient getPatient() { return patient; }
+    public Medication getMedication() { return medication; }
 
-    public int getMedicationId() {
-        return medicationId;
-    }
-
-    public Date getIssueDate() {
-        return issueDate;
-    }
-
-    public Date getExpiryDate() {
-        return expiryDate;
-    }
+    public Date getIssueDate() { return issueDate; }
+    public Date getExpiryDate() { return expiryDate; }
 
     @Override
     public String toString() {
