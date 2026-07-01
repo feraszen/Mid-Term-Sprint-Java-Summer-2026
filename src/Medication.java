@@ -1,11 +1,6 @@
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * Medication class represents a drug in the pharmacy system.
- * This class keeps all old fields and constructors, and adds simple explanations.
- * It also includes a random expiry date generator as required by the project.
- */
 public class Medication {
 
     // ===== OLD FIELDS (kept exactly as they were) =====
