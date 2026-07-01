@@ -1,9 +1,5 @@
 import java.util.ArrayList;
 
-/**
- * Patient class represents a patient in the system.
- * Supports storing prescriptions linked to the patient.
- */
 public class Patient {
 
     private int id;
