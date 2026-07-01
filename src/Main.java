@@ -1,9 +1,6 @@
 import java.util.Scanner;
 
-/**
- * Main class provides the console menu interface for the system.
- * This version keeps all old menu options and adds simple English explanations.
- */
+
 public class Main {
 
     public static void main(String[] args) {
