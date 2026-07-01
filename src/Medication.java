@@ -10,10 +10,7 @@ public class Medication {
     private Date expiryDate;   // Expiry date of the medication
     private String dose;       // Medication dosage
 
-    /**
-     * OLD CONSTRUCTOR — kept exactly as it was.
-     * Used when the expiry date is manually provided.
-     */
+
     public Medication(int id, String name, int stock, Date expiryDate, String dose) {
         this.id = id;
         this.name = name;
@@ -22,10 +19,6 @@ public class Medication {
         this.dose = dose;
     }
 
-    /**
-     * NEW CONSTRUCTOR — generates a random expiry date.
-     * This satisfies the requirement: "expiry date inclusive of the past".
-     */
     public Medication(int id, String name, int stock, String dose) {
         this.id = id;
         this.name = name;
@@ -34,10 +27,6 @@ public class Medication {
         this.expiryDate = generateRandomExpiryDate(); // random date
     }
 
-    /**
-     * Generates a random expiry date between -365 and +365 days from today.
-     * This means the medication may already be expired or may expire in the future.
-     */
     private Date generateRandomExpiryDate() {
         Calendar cal = Calendar.getInstance();
 
@@ -62,10 +51,7 @@ public class Medication {
     public void setExpiryDate(Date expiryDate) { this.expiryDate = expiryDate; }
     public void setDose(String dose) { this.dose = dose; }
 
-    /**
-     * OLD toString() — kept exactly as it was.
-     * Shows medication details including expiry date.
-     */
+
     @Override
     public String toString() {
         return "Medication{" +
