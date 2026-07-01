@@ -14,6 +14,7 @@ The system implements full OOP principles, supports all required features from t
 - Menu-driven interface using Scanner
 
 🚀 Implemented Features
+
 ✔ 1. Add Patient
 Create and store patient records (ID, name, age, phone).
 
