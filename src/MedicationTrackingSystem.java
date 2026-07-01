@@ -2,11 +2,6 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * MedicationTrackingSystem is the core controller of the pharmacy system.
- * It manages patients, doctors, medications, and prescriptions.
- * Old behavior is preserved, and new OOP improvements are added.
- */
 public class MedicationTrackingSystem {
 
     // ===== LISTS (OLD FIELDS, KEPT) =====
