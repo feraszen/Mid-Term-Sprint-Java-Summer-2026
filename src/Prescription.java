@@ -1,9 +1,5 @@
 import java.util.Date;
 
-/**
- * Prescription class represents a medical prescription.
- * Supports both ID-based and object-based linking.
- */
 public class Prescription {
 
     private int id;
